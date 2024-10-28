@@ -25,28 +25,41 @@ body {
 }
 
 /* Resources Section */
-.resources-section {
-    overflow-y: auto;
+.resources-grid {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Ensures heading and items stack vertically */
     gap: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #2c2c2c;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    overflow-y: auto;
+}
+
+/* Bingo Items Container */
+.bingo-items-container {
+    display: flex;
+    flex-wrap: wrap; /* Makes the items wrap if they overflow */
+    gap: 10px;
+    justify-content: flex-start;
 }
 
 /* Bingo Item Styling */
 .bingo-item {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
+    display: inline-flex;
     justify-content: center;
-    transition: background-color 0.3s, color 0.3s;
+    align-items: center;
+    padding: 5px 10px;
     background-color: grey;
     color: black;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    border: 1px solid #444;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 14px;
+    min-width: 80px;
+    min-height: 40px;
 }
 
 /* Log Section */
@@ -67,6 +80,17 @@ body {
     padding: 10px;
     background-color: #2c2c2c;
 }
+
+/* Resizable Grid Sections */
+.resources-grid, .incidents-section, .log-section {
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #2c2c2c;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+}
+
+
 
 /* Input Field Styling */
 .command-section input {
@@ -102,3 +126,4 @@ body {
     border-radius: 4px;
     font-weight: bold;
 }
+
