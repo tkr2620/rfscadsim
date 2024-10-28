@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAD Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="resources-section" id="bingoGrid">
+            <div class="bingo-item" id="LGBUNGEP">LGBUNGEP</div>
+            <div class="bingo-item" id="LGBUNGE1">LGBUNGE1</div>
+            <div class="bingo-item" id="LGBUNGE7">LGBUNGE7</div>
+            <div class="bingo-item" id="LGBOMBA1">LGBOMBA1</div>
+            <div class="bingo-item" id="LGBOMBA7">LGBOMBA7</div>
+            <div class="bingo-item" id="LGCAPFL1">LGCAPFL1</div>
+            <div class="bingo-item" id="LGCAPFL7">LGCAPFL7</div>
+            <div class="bingo-item" id="LGCMDJ">LGCMDJ</div>
+            <div class="bingo-item" id="LGCMDK">LGCMDK</div>
+            <div class="bingo-item" id="LGCMDH">LGCMDH</div>
+            <div class="bingo-item" id="LGCMDG">LGCMDG</div>
+            <div class="bingo-item" id="LGG1">LGG1</div>
+            <div class="bingo-item" id="LGG3">LGG3</div>
+            <div class="bingo-item" id="LGG4">LGG4</div>
+            <div class="bingo-item" id="LGDO">LGDO</div>
+            <div class="bingo-item" id="LGFCO1">LGFCO1</div>
+            <div class="bingo-item" id="LGFCO2">LGFCO2</div>
+            <div class="bingo-item" id="LGFCO41">LGFCO41</div>
+            <div class="bingo-item" id="LGJERCRP">LGJERCRP</div>
+            <div class="bingo-item" id="LGWAMBO1A">LGWAMBO1A</div>
+            <div class="bingo-item" id="LGHOSKI1">LGHOSKI1</div>
+            <div class="bingo-item" id="LGLAKEGE1">LGLAKEGE1</div>
+            <div class="bingo-item" id="LGLOGISA">LGLOGISA</div>
+        </div>
+
+        <div class="log-section">
+            <h3>Log</h3>
+            <div id="log"></div>
+        </div>
+
+        <div class="command-section">
+            <input type="text" id="commandInput" placeholder="Enter command..." autofocus>
+            <button onclick="processCommand()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        window.onload = () => {
+            const resources = document.querySelectorAll('.bingo-item');
+            resources.forEach(item => item.style.backgroundColor = 'grey');
+        };
+
+        function processCommand() {
+            const commandInput = document.getElementById("commandInput");
+            const log = document.getElementById("log");
+            const commandText = commandInput.value.trim();
+
+            if (commandText !== "") {
+                const parsedCommands = interpretCommand(commandText);
+                parsedCommands.forEach(logMessage => {
+                    const logEntry = document.createElement("div");
+                    logEntry.textContent = logMessage;
+                    log.appendChild(logEntry);
+                });
+                log.scrollTop = log.scrollHeight;
+                commandInput.value = "";
+            }
+        }
+
+        function interpretCommand(command) {
+            const [callsignsPart, commandType, statusOrMessage] = command.split('/');
+            const callsigns = callsignsPart.split(',');
+
+            const logMessages = [];
+
+            if (commandType === 'S') {
+                const statusString = getStatusString(statusOrMessage);
+                callsigns.forEach(callsign => {
+                    updateResourceStatus(callsign.trim(), statusOrMessage);
+                    logMessages.push(`${callsign.trim()}: Changed status to ${statusString}`);
+                });
+            }
+
+            if (commandType === 'M') {
+                const cleanedMessage = statusOrMessage.split(';')[0].trim();
+                callsigns.forEach(callsign => {
+                    logMessages.push(`${callsign.trim()}: ${cleanedMessage}`);
+                });
+            }
+
+            return logMessages;
+        }
+
+        function getStatusString(status) {
+            const statusMap = {
+                '1': 'responding',
+                '3': 'on scene',
+                '4': 'available',
+                '5': 'at station',
+                'AL': 'alerted'
+            };
+            return statusMap[status] || 'unknown';
+        }
+
+        function updateResourceStatus(callsign, status) {
+            const resourceElement = document.getElementById(callsign);
+            if (!resourceElement) return;
+
+            const statusColors = {
+                '1': 'yellow',
+                '3': 'black',
+                '4': 'green',
+                '5': 'grey',
+                'AL': 'blue'
+            };
+
+            resourceElement.style.backgroundColor = statusColors[status] || 'grey';
+            resourceElement.style.color = status === '3' ? 'white' : 'black';
+        }
+    </script>
+
+</body>
+</html>
