@@ -32,6 +32,7 @@
             <div class="bingo-item" id="LGWAMBO1A">LGWAMBO1A</div>
             <div class="bingo-item" id="LGHOSKI1">LGHOSKI1</div>
             <div class="bingo-item" id="LGLAKEGE1">LGLAKEGE1</div>
+            <div class="bingo-item" id="LGLAKEGE6">LGLAKEGE6</div>
             <div class="bingo-item" id="LGLOGISA">LGLOGISA</div>
         </div>
 
@@ -53,21 +54,42 @@
         };
 
         function processCommand() {
-            const commandInput = document.getElementById("commandInput");
-            const log = document.getElementById("log");
-            const commandText = commandInput.value.trim();
+    const commandInput = document.getElementById("commandInput");
+    const log = document.getElementById("log");
+    const commandText = commandInput.value.trim();
 
-            if (commandText !== "") {
-                const parsedCommands = interpretCommand(commandText);
-                parsedCommands.forEach(logMessage => {
-                    const logEntry = document.createElement("div");
-                    logEntry.textContent = logMessage;
-                    log.appendChild(logEntry);
-                });
-                log.scrollTop = log.scrollHeight;
-                commandInput.value = "";
-            }
-        }
+    if (commandText !== "") {
+        const parsedCommands = interpretCommand(commandText);
+        const timestamp = getCurrentTime(); // Get the current time
+
+        parsedCommands.forEach(logMessage => {
+            const logEntry = document.createElement("div");
+            logEntry.innerHTML = `[${timestamp}] ${highlightUnits(logMessage)}`; // Highlight units in the log
+            log.prepend(logEntry); // Add new logs to the top
+        });
+
+        commandInput.value = "";
+    }
+}
+
+function getCurrentTime() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`; // Format HH:MM:SS
+}
+
+function highlightUnits(logMessage) {
+    // Regex to find unit identifiers (e.g., LGBUNGEP, LGFCO1)
+    const unitRegex = /\b([A-Z]+[0-9A-Z]*)\b/g;
+    return logMessage.replace(
+        unitRegex,
+        '<span class="highlight-unit">$1</span>'
+    );
+}
+
+
 
         function interpretCommand(command) {
             const [callsignsPart, commandType, statusOrMessage] = command.split('/');
@@ -79,7 +101,7 @@
                 const statusString = getStatusString(statusOrMessage);
                 callsigns.forEach(callsign => {
                     updateResourceStatus(callsign.trim(), statusOrMessage);
-                    logMessages.push(`${callsign.trim()}: Changed status to ${statusString}`);
+                    logMessages.push(`${callsign.trim()}: Status updated to ${statusString}`);
                 });
             }
 
