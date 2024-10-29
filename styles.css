@@ -27,6 +27,7 @@ body {
 /* Log and How-To Column */
 .log-how-to-column {
     display: flex;
+    overflow-y: auto;
     flex-direction: column;
     gap: 10px;
     height: 100%; /* Full height of the column */
