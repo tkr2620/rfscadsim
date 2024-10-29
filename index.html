@@ -19,6 +19,9 @@
             <div class="bingo-item" id="LGB32">LGB32</div>
             <div class="bingo-item" id="LGBOMBA1">LGBOMBA1</div>
             <div class="bingo-item" id="LGBOMBA7">LGBOMBA7</div>
+            <div class="bingo-item" id="LGBRAID1">LGBRAID1</div>
+            <div class="bingo-item" id="LGBRAID7">LGBRAID7</div>
+            <div class="bingo-item" id="LGBRAID9">LGBRAID9</div>
             <div class="bingo-item" id="LGBORMT1">LGBORMT1</div>
             <div class="bingo-item" id="LGBORMT7">LGBORMT7</div>
             <div class="bingo-item" id="LGBUNGEP">LGBUNGEP</div>
@@ -56,6 +59,11 @@
             <div class="bingo-item" id="LGG2">LGG2</div>
             <div class="bingo-item" id="LGG3">LGG3</div>
             <div class="bingo-item" id="LGG4">LGG4</div>
+            <div class="bingo-item" id="LGG5">LGG5</div>
+            <div class="bingo-item" id="LGDG1">LGDG1</div>
+            <div class="bingo-item" id="LGDG2">LGDG2</div>
+            <div class="bingo-item" id="LGDG3">LGDG3</div>
+            <div class="bingo-item" id="LGDG4">LGDG4</div>
             <div class="bingo-item" id="LGHOSKI1">LGHOSKI1</div>
             <div class="bingo-item" id="LGHOSKI7">LGHOSKI7</div>
             <div class="bingo-item" id="LGHOSKI9">LGHOSKI9</div>
@@ -91,13 +99,49 @@
         </div>
     </div>
         
+    <!-- Log and How-To Column -->
+    <div class="log-how-to-column">
+        <!-- Log Section (Top Half) -->
         <div class="log-section">
             <h3>Log</h3>
             <div id="log"></div>
         </div>
 
+        <!-- How-To Guide Section (Bottom Half) -->
+        <div class="how-to-section">
+            <h3>How-To Guide</h3>
+            <p>This section will contain instructions on how to use the system:</p>
+            <ul>
+                <li><code>callsign/s/status</code>: Update a unit’s status.</li>
+                <li><code>callsign/m/message</code>: Add an operator comment to a unit.</li>
+                <li><code>callsign/m/message;R</code>: Adds a sitrep to the unit under their incident.</li>
+            </ul>
+        </div>
+    </div>
+        <div class="incidents-pane">
+            <h3>Incidents</h3>
+            <div class="incidents-grid" id="incidentsGrid">
+                <!-- Example Incident Card -->
+                <div class="incident-card" id="47657">
+                    <h4>CAD #47657</h4>
+                    <p><strong>Type:</strong> GRASS FIRE</p>
+                    <p><strong>Address:</strong> 123 Lake Road, Lake George</p>
+                    <p><strong>Narrative:</strong> INFT TRAVELLING DOWN FEDERAL HWY SAW SMOKE IN VIC OF GIVEN ADDRESS</p>
+
+                </div>
+        
+                <div class="incident-card" id="67890">
+                    <h4>CAD #67890</h4>
+                    <p><strong>Type:</strong> ASSIST AMBOS</p>
+                    <p><strong>Address:</strong> 45 Riverside Drive, Braidwood</p>
+                    <p><strong>Narrative:</strong> AMBOS REQ URGENT LIFT</p>
+
+                </div>
+            </div>
+        </div>
+        
         <div class="command-section">
-            <input type="text" id="commandInput" placeholder="Enter command..." autofocus>
+            <input type="text" id="commandInput" placeholder="Enter command here.. " autofocus>
             <button onclick="processCommand()">Submit</button>
         </div>
     </div>
@@ -115,24 +159,15 @@
 
     if (commandText !== "") {
         const parsedCommands = interpretCommand(commandText);
-        const timestamp = getCurrentTime(); // Get the current time
 
         parsedCommands.forEach(logMessage => {
             const logEntry = document.createElement("div");
-            logEntry.innerHTML = `[${timestamp}] ${highlightUnits(logMessage)}`; // Highlight units in the log
+            logEntry.innerHTML = ` ${highlightUnits(logMessage)}`; // Highlight units in the log
             log.prepend(logEntry); // Add new logs to the top
         });
 
         commandInput.value = "";
     }
-}
-
-function getCurrentTime() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`; // Format HH:MM:SS
 }
 
 function highlightUnits(logMessage) {
@@ -144,31 +179,56 @@ function highlightUnits(logMessage) {
     );
 }
 
+function getCurrentTime() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+}
 
+function interpretCommand(command) {
+    const [callsignsPart, commandType, statusOrMessage] = command.split('/');
+    const callsigns = callsignsPart.split(',');
+    const logMessages = [];
 
-        function interpretCommand(command) {
-            const [callsignsPart, commandType, statusOrMessage] = command.split('/');
-            const callsigns = callsignsPart.split(',');
+    if (commandType === 'S') {
+        const statusString = getStatusString(statusOrMessage);
+        callsigns.forEach(callsign => {
+            updateResourceStatus(callsign.trim(), statusOrMessage);
+            logMessages.push(`
+                <div class="log-message">
+                    <div class="log-header">
+                        <span class="log-tag">STATUS</span>
+                        <span class="timestamp">${getCurrentTime()}</span>
+                    </div>
+                    <span>${callsign.trim()}: Status updated to ${statusString}</span>
+                </div>
+            `);
+        });
+    }
 
-            const logMessages = [];
+    if (commandType === 'M') {
+        const messageParts = statusOrMessage.split(';');
+        const message = messageParts[0].trim();
+        const tag = messageParts[1] === 'R' ? 'SITREP' : 'OPERATOR COMMENT';
 
-            if (commandType === 'S') {
-                const statusString = getStatusString(statusOrMessage);
-                callsigns.forEach(callsign => {
-                    updateResourceStatus(callsign.trim(), statusOrMessage);
-                    logMessages.push(`${callsign.trim()}: Status updated to ${statusString}`);
-                });
-            }
+        callsigns.forEach(callsign => {
+            const logEntryHTML = `
+                <div class="log-message">
+                    <div class="log-header">
+                        <span class="log-tag ${tag.replace(' ', '-')}">${tag}</span>
+                        <span class="timestamp">${getCurrentTime()}</span>
+                    </div>
+                    <span>${callsign.trim()}: ${message}</span>
+                </div>
+            `;
+            logMessages.push(logEntryHTML);
+        });
+    }
 
-            if (commandType === 'M') {
-                const cleanedMessage = statusOrMessage.split(';')[0].trim();
-                callsigns.forEach(callsign => {
-                    logMessages.push(`${callsign.trim()}: ${cleanedMessage}`);
-                });
-            }
-
-            return logMessages;
-        }
+    return logMessages;
+}
 
         function getStatusString(status) {
             const statusMap = {
