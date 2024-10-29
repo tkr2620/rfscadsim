@@ -87,6 +87,7 @@
             <div class="bingo-item" id="LGQUEAN1">LGQUEAN1</div>
             <div class="bingo-item" id="LGQUEAN7A">LGQUEAN7A</div>
             <div class="bingo-item" id="LGQUEAN7B">LGQUEAN7B</div>
+            <div class="bingo-item" id="LGQUEAN9">LGQUEAN9</div>
             <div class="bingo-item" id="LGRIDGE1A">LGRIDGE1A</div>
             <div class="bingo-item" id="LGRIDGE1B">LGRIDGE1B</div>
             <div class="bingo-item" id="LGWAMBO1A">LGWAMBO1A</div>
@@ -229,10 +230,11 @@ function interpretCommand(command) {
 
         function getStatusString(status) {
             const statusMap = {
-                '1': 'responding',
-                '3': 'on scene',
-                '4': 'available',
-                '5': 'at station',
+                '01': 'responding',
+                '03': 'on scene',
+                '04': 'available',
+                '05': 'at station',
+                '07': 'not available',
                 'AL': 'alerted'
             };
             return statusMap[status] || 'unknown';
@@ -243,15 +245,16 @@ function interpretCommand(command) {
             if (!resourceElement) return;
 
             const statusColors = {
-                '1': 'yellow',
-                '3': 'black',
-                '4': 'green',
-                '5': 'grey',
+                '01': 'yellow',
+                '03': 'black',
+                '04': 'green',
+                '05': 'grey',
+                '07': '#CF9FFF',
                 'AL': 'blue'
             };
 
             resourceElement.style.backgroundColor = statusColors[status] || 'grey';
-            resourceElement.style.color = status === '3' ? 'white' : 'black';
+            resourceElement.style.color = status === '03' ? 'white' : 'black';
         }
     </script>
 
